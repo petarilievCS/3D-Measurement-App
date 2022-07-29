@@ -13,6 +13,8 @@ class ViewController: UIViewController, ARSCNViewDelegate {
 
     @IBOutlet var sceneView: ARSCNView!
     
+    var dotNodes = [SCNNode]()
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         
@@ -46,7 +48,23 @@ class ViewController: UIViewController, ARSCNViewDelegate {
         )
         dotNode.geometry = dotGeometry
         sceneView.scene.rootNode.addChildNode(dotNode)
+        dotNodes.append(dotNode)
         
+        if dotNodes.count >= 2 {
+            calculate()
+        }
+    }
+    
+    func calculate() {
+        let start = dotNodes[0]
+        let end = dotNodes[1]
+        
+        // mathematical formula for calculating distance
+        let a = start.position.x - end.position.x
+        let b = start.position.y - end.position.y
+        let c = start.position.z - end.position.z
+        let distance = sqrt(pow(a, 2) + pow(b, 2) + pow(c, 2))
+        print(distance)
     }
     
     override func viewWillAppear(_ animated: Bool) {
