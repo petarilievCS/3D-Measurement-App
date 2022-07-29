@@ -14,6 +14,7 @@ class ViewController: UIViewController, ARSCNViewDelegate {
     @IBOutlet var sceneView: ARSCNView!
     
     var dotNodes = [SCNNode]()
+    var textNode = SCNNode()
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -34,6 +35,14 @@ class ViewController: UIViewController, ARSCNViewDelegate {
     }
     
     func addDot(at location: ARHitTestResult) {
+        
+        if dotNodes.count > 1 {
+            for dotNode in dotNodes {
+                dotNode.removeFromParentNode()
+            }
+            dotNodes.removeAll()
+        }
+        
         let dotGeometry = SCNSphere(radius: 0.005)
         let dotNode = SCNNode()
         
@@ -63,8 +72,27 @@ class ViewController: UIViewController, ARSCNViewDelegate {
         let a = start.position.x - end.position.x
         let b = start.position.y - end.position.y
         let c = start.position.z - end.position.z
-        let distance = sqrt(pow(a, 2) + pow(b, 2) + pow(c, 2))
-        print(distance)
+        var distance = sqrt(pow(a, 2) + pow(b, 2) + pow(c, 2))
+        
+        // rounding distance
+        distance *= 10000
+        distance = round(distance)
+        distance /= 10000
+        
+        updateText(text: String(distance), at: end.position)
+    }
+    
+    func updateText(text: String, at position: SCNVector3) {
+        
+        textNode.removeFromParentNode()
+        let text = SCNText(string: text, extrusionDepth: 1.0)
+        text.firstMaterial?.diffuse.contents = UIColor.blue
+        
+        textNode = SCNNode(geometry: text)
+        textNode.position = position
+        textNode.scale = SCNVector3(0.01, 0.01, 0.01)
+        
+        sceneView.scene.rootNode.addChildNode(textNode)
     }
     
     override func viewWillAppear(_ animated: Bool) {
